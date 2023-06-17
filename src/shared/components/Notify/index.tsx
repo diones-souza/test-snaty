@@ -10,11 +10,20 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-const Notify: NextPage<PropsWithChildren<SnackbarProps>> = ({
+type NotifyProps = PropsWithChildren<SnackbarProps> & {
+  color: any
+  icon: any
+  onClose(): void
+}
+
+const Notify: NextPage<NotifyProps> = ({
   anchorOrigin,
   autoHideDuration,
   open,
-  children
+  color,
+  icon,
+  children,
+  onClose
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -25,7 +34,8 @@ const Notify: NextPage<PropsWithChildren<SnackbarProps>> = ({
     if (autoHideDuration) {
       setTimeout(() => {
         setIsOpen(false)
-      }, autoHideDuration * 1000) // segundos
+        onClose()
+      }, autoHideDuration * 1000)
     }
   }, [open, autoHideDuration])
 
@@ -38,11 +48,17 @@ const Notify: NextPage<PropsWithChildren<SnackbarProps>> = ({
     }
 
     setIsOpen(false)
+    onClose()
   }
 
   return (
     <Snackbar anchorOrigin={anchorOrigin} open={isOpen}>
-      <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+      <Alert
+        icon={icon}
+        onClose={handleClose}
+        color={color}
+        sx={{ width: '100%' }}
+      >
         {children}
       </Alert>
     </Snackbar>

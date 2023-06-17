@@ -54,12 +54,12 @@ function MyApp(props: MyAppProps) {
 
   const items = [
     {
-      name: 'Dasboard',
+      name: 'Home',
       icon: <HomeIcon />,
       url: '/'
     },
     {
-      name: 'Clients',
+      name: 'Clientes',
       icon: <PeopleIcon />,
       url: '/clients'
     }
