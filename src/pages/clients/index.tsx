@@ -40,7 +40,7 @@ const Clients: NextPage = () => {
 
   const [notify, setNotify] = useState(cleanNotify)
 
-  const { data, error, isValidating } = useFetch<Client[]>('Cliente')
+  const { data, error, isValidating, mutate } = useFetch<Client[]>('Cliente')
 
   useEffect(() => {
     if (error) {
@@ -69,6 +69,7 @@ const Clients: NextPage = () => {
   }
 
   const handleSave = (message: string) => {
+    mutate()
     setNotify({
       open: true,
       message,
