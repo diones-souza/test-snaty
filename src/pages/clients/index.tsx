@@ -1,15 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import type { NextPage } from 'next'
 import { useFetch } from '../../shared/hooks/useFetch'
-import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid'
-import { LinearProgress, Stack } from '@mui/material'
-import { CustomNoRowsOverlay, Notify, NewClient } from '../../shared/components'
+import {
+  DataGrid,
+  GridRowsProp,
+  GridColDef,
+  GridCellEditCommitParams
+} from '@mui/x-data-grid'
+import { LinearProgress, Stack, Button } from '@mui/material'
+import {
+  CustomNoRowsOverlay,
+  Notify,
+  FormClient
+} from '../../shared/components'
 import Head from 'next/head'
-import Button from '@mui/material/Button'
-import ErrorIcon from '@mui/icons-material/Error'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import {
+  Error as ErrorIcon,
+  CheckCircle as CheckCircleIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon
+} from '@mui/icons-material'
+import api from '../../shared/services/api'
+import { number } from 'yup'
 
-interface Client {
+interface Data {
   id: number
   nome: string
   numeroDocumento: string
@@ -28,9 +42,7 @@ interface NotifyProps {
   icon: any
 }
 
-const Clients: NextPage = () => {
-  const [openDialog, setOpenDialog] = useState(false)
-
+const Page: NextPage = () => {
   const cleanNotify: NotifyProps = {
     open: false,
     message: '',
@@ -38,9 +50,38 @@ const Clients: NextPage = () => {
     icon: null
   }
 
-  const [notify, setNotify] = useState(cleanNotify)
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
 
-  const { data, error, isValidating, mutate } = useFetch<Client[]>('Cliente')
+  const [notify, setNotify] = useState<NotifyProps>(cleanNotify)
+
+  const [selectedRows, setSelectedRows] = useState<any[]>([])
+
+  const { data, error, isValidating, mutate } = useFetch<Data[]>('Cliente')
+
+  const rows: GridRowsProp = data || []
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'Código', align: 'center', width: 70 },
+    { field: 'nome', headerName: 'Nome', width: 150, editable: true },
+    {
+      field: 'numeroDocumento',
+      headerName: 'Numero do Documento',
+      width: 180,
+      editable: true
+    },
+    {
+      field: 'tipoDocumento',
+      headerName: 'Tipo de Documento',
+      align: 'center',
+      width: 150,
+      editable: true
+    },
+    { field: 'logradouro', headerName: 'Rua', editable: true },
+    { field: 'numero', headerName: 'Numero', editable: true },
+    { field: 'bairro', headerName: 'Bairro', editable: true },
+    { field: 'cidade', headerName: 'Cidade', editable: true },
+    { field: 'uf', headerName: 'UF', align: 'center', editable: true }
+  ]
 
   useEffect(() => {
     if (error) {
@@ -68,6 +109,10 @@ const Clients: NextPage = () => {
     setNotify(cleanNotify)
   }
 
+  const handleSelectionChange = (selection: any[]) => {
+    setSelectedRows(selection)
+  }
+
   const handleSave = (message: string) => {
     mutate()
     setNotify({
@@ -78,25 +123,67 @@ const Clients: NextPage = () => {
     })
   }
 
-  const rows: GridRowsProp = data || []
+  const handleUpdade = (params: GridCellEditCommitParams) => {
+    const { id, field, value } = params
 
-  const columns: GridColDef[] = [
-    { field: 'nome', headerName: 'Nome' },
-    { field: 'numeroDocumento', headerName: 'Numero do Documento', width: 180 },
-    { field: 'tipoDocumento', headerName: 'Tipo de Documento', width: 150 },
-    { field: 'logradouro', headerName: 'Rua' },
-    { field: 'numero', headerName: 'Numero' },
-    { field: 'bairro', headerName: 'Bairro' },
-    { field: 'cidade', headerName: 'Cidade' },
-    { field: 'uf', headerName: 'UF' }
-  ]
+    const row: Data = rows.find(row => row.id === id)
+
+    const updateRow: Data = {
+      ...row,
+      [field]: value
+    }
+
+    api
+      .put(`Cliente/${id}`, updateRow)
+      .then(() => {
+        setNotify({
+          open: true,
+          message: 'Registro salvo com sucesso!',
+          color: 'success',
+          icon: <CheckCircleIcon />
+        })
+      })
+      .catch(error => {
+        setNotify({
+          open: true,
+          message: error?.response?.data || error?.message,
+          color: 'error',
+          icon: <ErrorIcon />
+        })
+      })
+  }
+
+  const handleDelete = async () => {
+    const erros: string[] = []
+    for (const id of selectedRows) {
+      await api
+        .delete(`Cliente/${id}`, { data: { id } })
+        .catch(error => erros.push(error?.response?.data || error?.message))
+    }
+    if (!erros.length) {
+      setNotify({
+        open: true,
+        message: 'Registro(s) excluído(s) com sucesso',
+        color: 'success',
+        icon: <CheckCircleIcon />
+      })
+    } else {
+      setNotify({
+        open: true,
+        message: erros.join(', '),
+        color: 'error',
+        icon: <ErrorIcon />
+      })
+    }
+    setSelectedRows([])
+  }
 
   return (
     <div>
       <Head>
         <title>Clients</title>
       </Head>
-      <NewClient
+      <FormClient
         open={openDialog}
         onClose={handleCloseDialog}
         onSave={handleSave}
@@ -119,13 +206,17 @@ const Clients: NextPage = () => {
           justifyContent="flex-end"
           alignItems="center"
           spacing={2}
+          sx={{ margin: '8px' }}
         >
-          <Button
-            onClick={handleOpenDialog}
-            sx={{ margin: '8px' }}
-            variant="contained"
-          >
-            Novo Cliente
+          {selectedRows.length > 0 && (
+            <Button onClick={handleDelete} variant="contained" color="error">
+              <DeleteIcon />
+              Excluir
+            </Button>
+          )}
+          <Button onClick={handleOpenDialog} variant="contained">
+            <AddIcon />
+            Novo
           </Button>
         </Stack>
         <div style={{ height: '75vh' }}>
@@ -133,8 +224,12 @@ const Clients: NextPage = () => {
             rows={rows}
             columns={columns}
             loading={isValidating}
-            checkboxSelection
             disableSelectionOnClick
+            checkboxSelection
+            onSelectionModelChange={handleSelectionChange}
+            selectionModel={selectedRows}
+            editMode="cell"
+            onCellEditCommit={handleUpdade}
             components={{
               LoadingOverlay: LinearProgress,
               NoRowsOverlay: CustomNoRowsOverlay
@@ -146,4 +241,4 @@ const Clients: NextPage = () => {
   )
 }
 
-export default Clients
+export default Page

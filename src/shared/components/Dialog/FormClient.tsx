@@ -17,7 +17,7 @@ import { TransitionProps } from '@mui/material/transitions'
 import * as yup from 'yup'
 import api from '../../services/api'
 
-interface Client {
+interface Data {
   nome: string
   numeroDocumento: string
   tipoDocumento: string
@@ -37,17 +37,13 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-type NewClientProps = PropsWithChildren<DialogProps> & {
+type FormClientProps = PropsWithChildren<DialogProps> & {
   onClose: () => void
   onSave: (message: string) => void
 }
 
-const NewClient: NextPage<NewClientProps> = ({ open, onClose, onSave }) => {
-  const [isOpen, setIsOpen] = useState(false)
-
-  const [isLoading, setIsLoading] = useState(false)
-
-  const cleanClient: Client = {
+const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
+  const cleanData: Data = {
     nome: '',
     numeroDocumento: '',
     tipoDocumento: '',
@@ -58,9 +54,13 @@ const NewClient: NextPage<NewClientProps> = ({ open, onClose, onSave }) => {
     uf: ''
   }
 
-  const [customerData, setCustomerData] = useState(cleanClient)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const [errors, setErrors] = useState(cleanClient)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [customerData, setCustomerData] = useState(cleanData)
+
+  const [errors, setErrors] = useState(cleanData)
 
   useEffect(() => {
     if (open) {
@@ -71,8 +71,8 @@ const NewClient: NextPage<NewClientProps> = ({ open, onClose, onSave }) => {
   const handleClose = () => {
     setIsOpen(false)
     setIsLoading(false)
-    setCustomerData(cleanClient)
-    setErrors(cleanClient)
+    setCustomerData(cleanData)
+    setErrors(cleanData)
     onClose()
   }
 
@@ -103,7 +103,7 @@ const NewClient: NextPage<NewClientProps> = ({ open, onClose, onSave }) => {
       })
 
       await schema.validate(customerData, { abortEarly: false })
-      setErrors(cleanClient)
+      setErrors(cleanData)
       return true
     } catch (validationErrors: any) {
       const errors: any = {}
@@ -115,11 +115,11 @@ const NewClient: NextPage<NewClientProps> = ({ open, onClose, onSave }) => {
     }
   }
 
-  const handleSubmit = async () => {
-    validateForm().then(async isValid => {
+  const handleSubmit = () => {
+    validateForm().then(isValid => {
       if (isValid) {
         setIsLoading(true)
-        await api
+        api
           .post('Cliente', customerData)
           .then(() => {
             handleClose()
@@ -250,4 +250,4 @@ const NewClient: NextPage<NewClientProps> = ({ open, onClose, onSave }) => {
   )
 }
 
-export { NewClient }
+export { FormClient }
