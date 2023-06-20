@@ -101,13 +101,13 @@ const Page: NextPage = () => {
     setSelectedRows(selection)
   }
 
-  const handleSave = (message: string) => {
+  const handleSave = (message: string, status: string) => {
     mutate()
     setNotify({
       open: true,
       message,
-      color: 'success',
-      icon: <CheckCircleIcon />
+      color: status,
+      icon: status === 'success' ? <CheckCircleIcon /> : <ErrorIcon />
     })
   }
 
@@ -171,7 +171,7 @@ const Page: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>Clients</title>
+        <title>Clientes</title>
       </Head>
       <FormClient
         open={openDialog}

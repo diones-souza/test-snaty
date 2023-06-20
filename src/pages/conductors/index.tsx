@@ -11,8 +11,8 @@ import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
   Notify,
-  FormVehicle,
-  Vehicle
+  FormConductor,
+  Conductor
 } from '../../shared/components'
 import Head from 'next/head'
 import {
@@ -44,29 +44,30 @@ const Page: NextPage = () => {
 
   const [selectedRows, setSelectedRows] = useState<any[]>([])
 
-  const { data, error, isValidating, mutate } = useFetch<Vehicle[]>('Veiculo')
+  const { data, error, isValidating, mutate } =
+    useFetch<Conductor[]>('Condutor')
 
   const rows: GridRowsProp = data || []
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Código', align: 'center', width: 70 },
-    { field: 'placa', headerName: 'Placa', width: 150, editable: true },
+    { field: 'nome', headerName: 'Nome', width: 150, editable: true },
     {
-      field: 'marcaModelo',
-      headerName: 'Marca/Modelo',
+      field: 'numeroHabilitacao',
+      headerName: 'Numero Habilitação',
       width: 150,
       editable: true
     },
     {
-      field: 'anoFabricacao',
-      headerName: 'Ano de Fabricação',
+      field: 'catergoriaHabilitacao',
+      headerName: 'Catergoria Habilitação',
       align: 'center',
       width: 150,
       editable: true
     },
     {
-      field: 'kmAtual',
-      headerName: 'KM Atual',
+      field: 'vencimentoHabilitacao',
+      headerName: 'Vencimento Habilitação',
       align: 'right',
       width: 150,
       editable: true
@@ -116,15 +117,15 @@ const Page: NextPage = () => {
   const handleUpdade = (params: GridCellEditCommitParams) => {
     const { id, field, value } = params
 
-    const row: Vehicle = rows.find(row => row.id === id)
+    const row: Conductor = rows.find(row => row.id === id)
 
-    const updateRow: Vehicle = {
+    const updateRow: Conductor = {
       ...row,
       [field]: value
     }
 
     api
-      .put(`Veiculo/${id}`, updateRow)
+      .put(`Condutor/${id}`, updateRow)
       .then(() => {
         mutate()
         setNotify({
@@ -148,7 +149,7 @@ const Page: NextPage = () => {
     const erros: string[] = []
     for (const id of selectedRows) {
       await api
-        .delete(`Veiculo/${id}`, { data: { id } })
+        .delete(`Condutor/${id}`, { data: { id } })
         .catch(error => erros.push(error?.response?.data || error?.message))
     }
     if (!erros.length) {
@@ -173,9 +174,9 @@ const Page: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>Veículos</title>
+        <title>Condutores</title>
       </Head>
-      <FormVehicle
+      <FormConductor
         open={openDialog}
         onClose={handleCloseDialog}
         onSave={handleSave}

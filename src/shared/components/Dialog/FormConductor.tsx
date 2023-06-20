@@ -20,12 +20,12 @@ import { TransitionProps } from '@mui/material/transitions'
 import * as yup from 'yup'
 import api from '../../services/api'
 
-export interface Vehicle {
+export interface Conductor {
   id?: number
-  placa: string
-  marcaModelo: string
-  anoFabricacao: number | null
-  kmAtual: number | null
+  nome: string
+  numeroHabilitacao: string
+  categoriaHabilitacao: string
+  vencimentoHabilitacao: string
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -42,12 +42,16 @@ type FormClientProps = PropsWithChildren<DialogProps> & {
   onSave: (message: string, status: string) => void
 }
 
-const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
-  const cleanData: Vehicle = {
-    placa: '',
-    marcaModelo: '',
-    anoFabricacao: null,
-    kmAtual: null
+const FormConductor: NextPage<FormClientProps> = ({
+  open,
+  onClose,
+  onSave
+}) => {
+  const cleanData: Conductor = {
+    nome: '',
+    numeroHabilitacao: '',
+    categoriaHabilitacao: '',
+    vencimentoHabilitacao: ''
   }
 
   const [isOpen, setIsOpen] = useState(false)
@@ -80,27 +84,30 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
     }))
   }
 
-  const handleYearChange = (date: any) => {
-    const year = date.format('YYYY')
+  const handleDateChange = (date: any) => {
+    const year = date.format('YYYY-MM-DD')
 
     setCustomerData(prevData => ({
       ...prevData,
-      anoFabricacao: year
+      vencimentoHabilitacao: year
     }))
   }
 
   const validateForm = async () => {
     try {
       const schema = yup.object().shape({
-        placa: yup
+        nome: yup
           .string()
           .min(3, 'Mínimo de 3 caracteres')
           .required('Campo obrigatório'),
-        marcaModelo: yup.string().required('Campo obrigatório'),
-        kmAtual: yup
-          .number()
-          .typeError('Deve ser um número')
-          .min(0, 'Deve ser maior ou igual a zero')
+        numeroHabilitacao: yup
+          .string()
+          .matches(/^\d+$/, 'Deve conter apenas números')
+          .required('Campo obrigatório'),
+        categoriaHabilitacao: yup
+          .string()
+          .max(2, 'Máximo de 2 caracteres')
+          .required('Campo obrigatório')
       })
 
       await schema.validate(customerData, { abortEarly: false })
@@ -121,7 +128,7 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
       if (isValid) {
         setIsLoading(true)
         api
-          .post('Veiculo', customerData)
+          .post('Condutor', customerData)
           .then(() => {
             handleClose()
             onSave('Registro salvo com sucesso!', 'success')
@@ -155,45 +162,44 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
             autoComplete="off"
           >
             <TextField
-              label="Placa"
-              name="placa"
+              label="Nome"
+              name="nome"
               type="text"
-              value={customerData.placa}
+              value={customerData.nome}
               onChange={handleChange}
               fullWidth
               margin="normal"
-              error={Boolean(errors.placa)}
-              helperText={errors.placa}
+              error={Boolean(errors.nome)}
+              helperText={errors.nome}
             />
             <TextField
-              label="Marca/Modelo"
-              name="marcaModelo"
+              label="Numero Habilitação"
+              name="numeroHabilitacao"
               type="text"
-              value={customerData.marcaModelo}
+              value={customerData.numeroHabilitacao}
               onChange={handleChange}
               fullWidth
               margin="normal"
-              error={Boolean(errors.marcaModelo)}
-              helperText={errors.marcaModelo}
+              error={Boolean(errors.numeroHabilitacao)}
+              helperText={errors.numeroHabilitacao}
+            />
+            <TextField
+              label="Categoria Habilitação"
+              name="categoriaHabilitacao"
+              type="text"
+              value={customerData.categoriaHabilitacao}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              error={Boolean(errors.categoriaHabilitacao)}
+              helperText={errors.categoriaHabilitacao}
             />
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DatePicker
-                views={['year']}
-                label="Ano de Fabricação"
-                onChange={handleYearChange}
+                label="Vencimento Habilitação"
+                onChange={handleDateChange}
               />
             </LocalizationProvider>
-            <TextField
-              label="KM Atual"
-              name="kmAtual"
-              type="number"
-              value={customerData.kmAtual}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              error={Boolean(errors.kmAtual)}
-              helperText={errors.kmAtual}
-            />
           </Box>
         </DialogContent>
         <Divider />
@@ -214,4 +220,4 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
   )
 }
 
-export { FormVehicle }
+export { FormConductor }

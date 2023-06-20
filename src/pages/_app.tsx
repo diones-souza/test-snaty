@@ -18,7 +18,8 @@ import MenuIcon from '@mui/icons-material/Menu'
 import {
   Home as HomeIcon,
   People as PeopleIcon,
-  DirectionsCar as DirectionsCarIcon
+  DirectionsCar as DirectionsCarIcon,
+  AccountBox as AccountBoxIcon
 } from '@mui/icons-material'
 import ThemeContainer from '../shared/theme/ThemeContainer'
 import createEmotionCache from '../../config/createEmotionCache'
@@ -53,6 +54,11 @@ function MyApp(props: MyAppProps) {
       name: 'Veículos',
       icon: <DirectionsCarIcon />,
       url: '/vehicles'
+    },
+    {
+      name: 'Condutores',
+      icon: <AccountBoxIcon />,
+      url: '/conductors'
     }
   ]
 

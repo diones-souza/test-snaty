@@ -40,7 +40,7 @@ const Transition = React.forwardRef(function Transition(
 
 type FormClientProps = PropsWithChildren<DialogProps> & {
   onClose: () => void
-  onSave: (message: string) => void
+  onSave: (message: string, status: string) => void
 }
 
 const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
@@ -124,9 +124,12 @@ const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
           .post('Cliente', customerData)
           .then(() => {
             handleClose()
-            onSave('Registro salvo com sucesso!')
+            onSave('Registro salvo com sucesso!', 'success')
           })
-          .catch(() => setIsLoading(false))
+          .catch(error => {
+            onSave(error?.response?.data || error?.message, 'error')
+            setIsLoading(false)
+          })
       }
     })
   }
