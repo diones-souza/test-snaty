@@ -85,11 +85,11 @@ const FormConductor: NextPage<FormClientProps> = ({
   }
 
   const handleDateChange = (date: any) => {
-    const year = date.format('YYYY-MM-DD')
+    date = date.format('YYYY-MM-DD')
 
     setCustomerData(prevData => ({
       ...prevData,
-      vencimentoHabilitacao: year
+      vencimentoHabilitacao: date
     }))
   }
 
@@ -134,7 +134,13 @@ const FormConductor: NextPage<FormClientProps> = ({
             onSave('Registro salvo com sucesso!', 'success')
           })
           .catch(error => {
-            onSave(error?.response?.data || error?.message, 'error')
+            const message = error?.response?.data ?? error?.message
+            onSave(
+              typeof message === 'string'
+                ? message
+                : 'An unknown error occurred. Please try again later.',
+              'error'
+            )
             setIsLoading(false)
           })
       }

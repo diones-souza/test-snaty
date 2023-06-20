@@ -11,8 +11,8 @@ import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
   Notify,
-  FormClient,
-  Client
+  FormDisplacement,
+  Displacement
 } from '../../shared/components'
 import Head from 'next/head'
 import {
@@ -44,31 +44,60 @@ const Page: NextPage = () => {
 
   const [selectedRows, setSelectedRows] = useState<any[]>([])
 
-  const { data, error, isValidating, mutate } = useFetch<Client[]>('Cliente')
+  const { data, error, isValidating, mutate } =
+    useFetch<Displacement[]>('Deslocamento')
 
   const rows: GridRowsProp = data || []
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Código', align: 'center', width: 70 },
-    { field: 'nome', headerName: 'Nome', width: 150, editable: true },
     {
-      field: 'numeroDocumento',
-      headerName: 'Numero do Documento',
-      width: 180,
-      editable: true
-    },
-    {
-      field: 'tipoDocumento',
-      headerName: 'Tipo de Documento',
+      field: 'kmInicial',
+      headerName: 'KM Inicial',
       align: 'center',
-      width: 150,
-      editable: true
+      width: 150
     },
-    { field: 'logradouro', headerName: 'Rua', editable: true },
-    { field: 'numero', headerName: 'Numero', editable: true },
-    { field: 'bairro', headerName: 'Bairro', editable: true },
-    { field: 'cidade', headerName: 'Cidade', editable: true },
-    { field: 'uf', headerName: 'UF', align: 'center', editable: true }
+    {
+      field: 'kmFinal',
+      headerName: 'KM Final',
+      align: 'center',
+      width: 150
+    },
+    {
+      field: 'inicioDeslocamento',
+      headerName: 'Início do Deslocamento',
+      align: 'center',
+      width: 200
+    },
+    {
+      field: 'fimDeslocamento',
+      headerName: 'Fim do Deslocamento',
+      align: 'center',
+      width: 200
+    },
+    {
+      field: 'checkList',
+      headerName: 'CheckList'
+    },
+    {
+      field: 'observacao',
+      headerName: 'Observacao.'
+    },
+    {
+      field: 'idCondutor',
+      headerName: 'Código do Condutor.',
+      align: 'center'
+    },
+    {
+      field: 'idVeiculo',
+      headerName: 'Código do Veículos .',
+      align: 'center'
+    },
+    {
+      field: 'idCliente',
+      headerName: 'Código do Cliente.',
+      align: 'center'
+    }
   ]
 
   useEffect(() => {
@@ -111,45 +140,10 @@ const Page: NextPage = () => {
     })
   }
 
-  const handleUpdade = (params: GridCellEditCommitParams) => {
-    const { id, field, value } = params
-
-    const row: Client = rows.find(row => row.id === id)
-
-    const updateRow: Client = {
-      ...row,
-      [field]: value
-    }
-
-    api
-      .put(`Cliente/${id}`, updateRow)
-      .then(() => {
-        mutate()
-        setNotify({
-          open: true,
-          message: 'Registro salvo com sucesso!',
-          color: 'success',
-          icon: <CheckCircleIcon />
-        })
-      })
-      .catch(error => {
-        const message = error?.response?.data ?? error?.message
-        setNotify({
-          open: true,
-          message:
-            typeof message === 'string'
-              ? message
-              : 'An unknown error occurred. Please try again later.',
-          color: 'error',
-          icon: <ErrorIcon />
-        })
-      })
-  }
-
   const handleDelete = async () => {
     const erros: string[] = []
     for (const id of selectedRows) {
-      await api.delete(`Cliente/${id}`, { data: { id } }).catch(error => {
+      await api.delete(`Deslocamento/${id}`, { data: { id } }).catch(error => {
         const message = error?.response?.data ?? error?.message
         erros.push(
           typeof message === 'string'
@@ -180,9 +174,9 @@ const Page: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>Clientes</title>
+        <title>Deslocamentos</title>
       </Head>
-      <FormClient
+      <FormDisplacement
         open={openDialog}
         onClose={handleCloseDialog}
         onSave={handleSave}
@@ -227,8 +221,6 @@ const Page: NextPage = () => {
             checkboxSelection
             onSelectionModelChange={handleSelectionChange}
             selectionModel={selectedRows}
-            editMode="cell"
-            onCellEditCommit={handleUpdade}
             components={{
               LoadingOverlay: LinearProgress,
               NoRowsOverlay: CustomNoRowsOverlay

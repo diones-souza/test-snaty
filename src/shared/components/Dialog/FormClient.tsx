@@ -127,7 +127,13 @@ const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
             onSave('Registro salvo com sucesso!', 'success')
           })
           .catch(error => {
-            onSave(error?.response?.data || error?.message, 'error')
+            const message = error?.response?.data ?? error?.message
+            onSave(
+              typeof message === 'string'
+                ? message
+                : 'An unknown error occurred. Please try again later.',
+              'error'
+            )
             setIsLoading(false)
           })
       }

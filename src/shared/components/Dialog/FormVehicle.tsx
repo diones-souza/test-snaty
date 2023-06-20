@@ -24,8 +24,8 @@ export interface Vehicle {
   id?: number
   placa: string
   marcaModelo: string
-  anoFabricacao: number | null
-  kmAtual: number | null
+  anoFabricacao: string
+  kmAtual: string
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -46,8 +46,8 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
   const cleanData: Vehicle = {
     placa: '',
     marcaModelo: '',
-    anoFabricacao: null,
-    kmAtual: null
+    anoFabricacao: '',
+    kmAtual: ''
   }
 
   const [isOpen, setIsOpen] = useState(false)
@@ -127,7 +127,13 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
             onSave('Registro salvo com sucesso!', 'success')
           })
           .catch(error => {
-            onSave(error?.response?.data || error?.message, 'error')
+            const message = error?.response?.data ?? error?.message
+            onSave(
+              typeof message === 'string'
+                ? message
+                : 'An unknown error occurred. Please try again later.',
+              'error'
+            )
             setIsLoading(false)
           })
       }

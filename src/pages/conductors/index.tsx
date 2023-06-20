@@ -136,9 +136,13 @@ const Page: NextPage = () => {
         })
       })
       .catch(error => {
+        const message = error?.response?.data ?? error?.message
         setNotify({
           open: true,
-          message: error?.response?.data || error?.message,
+          message:
+            typeof message === 'string'
+              ? message
+              : 'An unknown error occurred. Please try again later.',
           color: 'error',
           icon: <ErrorIcon />
         })
@@ -148,9 +152,14 @@ const Page: NextPage = () => {
   const handleDelete = async () => {
     const erros: string[] = []
     for (const id of selectedRows) {
-      await api
-        .delete(`Condutor/${id}`, { data: { id } })
-        .catch(error => erros.push(error?.response?.data || error?.message))
+      await api.delete(`Condutor/${id}`, { data: { id } }).catch(error => {
+        const message = error?.response?.data ?? error?.message
+        erros.push(
+          typeof message === 'string'
+            ? message
+            : 'An unknown error occurred. Please try again later.'
+        )
+      })
     }
     if (!erros.length) {
       setNotify({

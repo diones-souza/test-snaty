@@ -18,8 +18,9 @@ import MenuIcon from '@mui/icons-material/Menu'
 import {
   Home as HomeIcon,
   People as PeopleIcon,
-  DirectionsCar as DirectionsCarIcon,
+  Commute as CommuteIcon,
   AccountBox as AccountBoxIcon,
+  DirectionsCar as DirectionsCarIcon,
   NightsStay as NightsStayIcon
 } from '@mui/icons-material'
 import ThemeContainer from '../shared/theme/ThemeContainer'
@@ -53,13 +54,18 @@ function MyApp(props: MyAppProps) {
     },
     {
       name: 'Veículos',
-      icon: <DirectionsCarIcon />,
+      icon: <CommuteIcon />,
       url: '/vehicles'
     },
     {
       name: 'Condutores',
       icon: <AccountBoxIcon />,
       url: '/conductors'
+    },
+    {
+      name: 'Deslocamento',
+      icon: <DirectionsCarIcon />,
+      url: '/displacement'
     },
     {
       name: 'Previsão do tempo',
