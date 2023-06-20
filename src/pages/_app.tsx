@@ -19,7 +19,8 @@ import {
   Home as HomeIcon,
   People as PeopleIcon,
   DirectionsCar as DirectionsCarIcon,
-  AccountBox as AccountBoxIcon
+  AccountBox as AccountBoxIcon,
+  NightsStay as NightsStayIcon
 } from '@mui/icons-material'
 import ThemeContainer from '../shared/theme/ThemeContainer'
 import createEmotionCache from '../../config/createEmotionCache'
@@ -59,6 +60,11 @@ function MyApp(props: MyAppProps) {
       name: 'Condutores',
       icon: <AccountBoxIcon />,
       url: '/conductors'
+    },
+    {
+      name: 'Previsão do tempo',
+      icon: <NightsStayIcon />,
+      url: '/weatherForecast'
     }
   ]
 
