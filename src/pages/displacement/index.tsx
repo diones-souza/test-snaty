@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import type { NextPage } from 'next'
 import { useFetch } from '../../shared/hooks/useFetch'
-import {
-  DataGrid,
-  GridRowsProp,
-  GridColDef,
-  GridCellEditCommitParams
-} from '@mui/x-data-grid'
+import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid'
 import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
