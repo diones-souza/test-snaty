@@ -18,7 +18,7 @@ import * as yup from 'yup'
 import api from '../../services/api'
 
 export interface Client {
-  id: number
+  id?: number
   nome: string
   numeroDocumento: string
   tipoDocumento: string
@@ -45,7 +45,6 @@ type FormClientProps = PropsWithChildren<DialogProps> & {
 
 const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
   const cleanData: Client = {
-    id: 0,
     nome: '',
     numeroDocumento: '',
     tipoDocumento: '',

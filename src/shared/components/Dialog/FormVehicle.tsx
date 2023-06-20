@@ -21,11 +21,11 @@ import * as yup from 'yup'
 import api from '../../services/api'
 
 export interface Vehicle {
-  id: number
+  id?: number
   placa: string
   marcaModelo: string
-  anoFabricacao: number
-  kmAtual: number
+  anoFabricacao: number | null
+  kmAtual: number | null
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -44,11 +44,10 @@ type FormClientProps = PropsWithChildren<DialogProps> & {
 
 const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
   const cleanData: Vehicle = {
-    id: 0,
     placa: '',
     marcaModelo: '',
-    anoFabricacao: 0,
-    kmAtual: 0
+    anoFabricacao: null,
+    kmAtual: null
   }
 
   const [isOpen, setIsOpen] = useState(false)
