@@ -17,6 +17,7 @@
     "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "^5.13.5",
     "@mui/x-data-grid": "^5.15.0",
+    "@mui/x-date-pickers": "^6.8.0",
     "axios": "^0.27.2",
     "lodash": "^4.17.21",
     "next": "12.2.3",

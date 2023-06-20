@@ -11,8 +11,8 @@ import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
   Notify,
-  FormClient,
-  Client
+  FormVehicle,
+  Vehicle
 } from '../../shared/components'
 import Head from 'next/head'
 import {
@@ -44,31 +44,33 @@ const Page: NextPage = () => {
 
   const [selectedRows, setSelectedRows] = useState<any[]>([])
 
-  const { data, error, isValidating, mutate } = useFetch<Client[]>('Cliente')
+  const { data, error, isValidating, mutate } = useFetch<Vehicle[]>('Veiculo')
 
   const rows: GridRowsProp = data || []
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Código', align: 'center', width: 70 },
-    { field: 'nome', headerName: 'Nome', width: 150, editable: true },
+    { field: 'placa', headerName: 'Placa', width: 150, editable: true },
     {
-      field: 'numeroDocumento',
-      headerName: 'Numero do Documento',
-      width: 180,
+      field: 'marcaModelo',
+      headerName: 'Marca/Modelo',
+      width: 150,
       editable: true
     },
     {
-      field: 'tipoDocumento',
-      headerName: 'Tipo de Documento',
+      field: 'anoFabricacao',
+      headerName: 'Ano de Fabricação',
       align: 'center',
       width: 150,
       editable: true
     },
-    { field: 'logradouro', headerName: 'Rua', editable: true },
-    { field: 'numero', headerName: 'Numero', editable: true },
-    { field: 'bairro', headerName: 'Bairro', editable: true },
-    { field: 'cidade', headerName: 'Cidade', editable: true },
-    { field: 'uf', headerName: 'UF', align: 'center', editable: true }
+    {
+      field: 'kmAtual',
+      headerName: 'KM Atual',
+      align: 'right',
+      width: 150,
+      editable: true
+    }
   ]
 
   useEffect(() => {
@@ -114,15 +116,15 @@ const Page: NextPage = () => {
   const handleUpdade = (params: GridCellEditCommitParams) => {
     const { id, field, value } = params
 
-    const row: Client = rows.find(row => row.id === id)
+    const row: Vehicle = rows.find(row => row.id === id)
 
-    const updateRow: Client = {
+    const updateRow: Vehicle = {
       ...row,
       [field]: value
     }
 
     api
-      .put(`Cliente/${id}`, updateRow)
+      .put(`Veiculo/${id}`, updateRow)
       .then(() => {
         mutate()
         setNotify({
@@ -146,7 +148,7 @@ const Page: NextPage = () => {
     const erros: string[] = []
     for (const id of selectedRows) {
       await api
-        .delete(`Cliente/${id}`, { data: { id } })
+        .delete(`Veiculo/${id}`, { data: { id } })
         .catch(error => erros.push(error?.response?.data || error?.message))
     }
     if (!erros.length) {
@@ -171,9 +173,9 @@ const Page: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>Clients</title>
+        <title>Veículos</title>
       </Head>
-      <FormClient
+      <FormVehicle
         open={openDialog}
         onClose={handleCloseDialog}
         onSave={handleSave}

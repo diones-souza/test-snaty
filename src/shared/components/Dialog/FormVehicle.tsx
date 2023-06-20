@@ -12,21 +12,20 @@ import {
   Divider
 } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers'
 import Slide from '@mui/material/Slide'
 import { TransitionProps } from '@mui/material/transitions'
 import * as yup from 'yup'
 import api from '../../services/api'
 
-export interface Client {
+export interface Vehicle {
   id: number
-  nome: string
-  numeroDocumento: string
-  tipoDocumento: string
-  logradouro: string
-  numero: string
-  bairro: string
-  cidade: string
-  uf: string
+  placa: string
+  marcaModelo: string
+  anoFabricacao: number
+  kmAtual: number
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -43,17 +42,13 @@ type FormClientProps = PropsWithChildren<DialogProps> & {
   onSave: (message: string) => void
 }
 
-const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
-  const cleanData: Client = {
+const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
+  const cleanData: Vehicle = {
     id: 0,
-    nome: '',
-    numeroDocumento: '',
-    tipoDocumento: '',
-    logradouro: '',
-    numero: '',
-    bairro: '',
-    cidade: '',
-    uf: ''
+    placa: '',
+    marcaModelo: '',
+    anoFabricacao: 0,
+    kmAtual: 0
   }
 
   const [isOpen, setIsOpen] = useState(false)
@@ -86,22 +81,27 @@ const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
     }))
   }
 
+  const handleYearChange = (date: any) => {
+    const year = date.format('YYYY')
+
+    setCustomerData(prevData => ({
+      ...prevData,
+      anoFabricacao: year
+    }))
+  }
+
   const validateForm = async () => {
     try {
       const schema = yup.object().shape({
-        nome: yup
+        placa: yup
           .string()
           .min(3, 'Mínimo de 3 caracteres')
           .required('Campo obrigatório'),
-        numeroDocumento: yup
-          .string()
-          .matches(/^\d+$/, 'Deve conter apenas números')
-          .required('Campo obrigatório'),
-        tipoDocumento: yup.string().required('Campo obrigatório'),
-        uf: yup
-          .string()
-          .max(2, 'Máximo 2 caracteres')
-          .matches(/^[a-zA-Z\s]*$/, 'Deve conter apenas letras')
+        marcaModelo: yup.string().required('Campo obrigatório'),
+        kmAtual: yup
+          .number()
+          .typeError('Deve ser um número')
+          .min(0, 'Deve ser maior ou igual a zero')
       })
 
       await schema.validate(customerData, { abortEarly: false })
@@ -122,7 +122,7 @@ const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
       if (isValid) {
         setIsLoading(true)
         api
-          .post('Cliente', customerData)
+          .post('Veiculo', customerData)
           .then(() => {
             handleClose()
             onSave('Registro salvo com sucesso!')
@@ -153,84 +153,44 @@ const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
             autoComplete="off"
           >
             <TextField
-              label="Nome"
-              name="nome"
+              label="Placa"
+              name="placa"
               type="text"
-              value={customerData.nome}
+              value={customerData.placa}
               onChange={handleChange}
               fullWidth
               margin="normal"
-              error={Boolean(errors.nome)}
-              helperText={errors.nome}
+              error={Boolean(errors.placa)}
+              helperText={errors.placa}
             />
             <TextField
-              label="Número Documento"
-              name="numeroDocumento"
+              label="Marca/Modelo"
+              name="marcaModelo"
               type="text"
-              value={customerData.numeroDocumento}
+              value={customerData.marcaModelo}
               onChange={handleChange}
               fullWidth
               margin="normal"
-              error={Boolean(errors.numeroDocumento)}
-              helperText={errors.numeroDocumento}
+              error={Boolean(errors.marcaModelo)}
+              helperText={errors.marcaModelo}
             />
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                views={['year']}
+                label="Ano de Fabricação"
+                onChange={handleYearChange}
+              />
+            </LocalizationProvider>
             <TextField
-              label="Tipo Documento"
-              name="tipoDocumento"
-              type="text"
-              value={customerData.tipoDocumento}
+              label="KM Atual"
+              name="kmAtual"
+              type="number"
+              value={customerData.kmAtual}
               onChange={handleChange}
               fullWidth
               margin="normal"
-              error={Boolean(errors.tipoDocumento)}
-              helperText={errors.tipoDocumento}
-            />
-            <TextField
-              label="Logradouro"
-              name="logradouro"
-              type="text"
-              value={customerData.logradouro}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Número"
-              name="numero"
-              type="text"
-              value={customerData.numero}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Bairro"
-              name="bairro"
-              type="text"
-              value={customerData.bairro}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Cidade"
-              name="cidade"
-              type="text"
-              value={customerData.cidade}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="UF"
-              name="uf"
-              type="text"
-              value={customerData.uf}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              error={Boolean(errors.uf)}
-              helperText={errors.uf}
+              error={Boolean(errors.kmAtual)}
+              helperText={errors.kmAtual}
             />
           </Box>
         </DialogContent>
@@ -252,4 +212,4 @@ const FormClient: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
   )
 }
 
-export { FormClient }
+export { FormVehicle }

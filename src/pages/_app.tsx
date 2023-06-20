@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 import { AppProps } from 'next/app'
@@ -15,8 +15,11 @@ import {
   Hidden
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import PeopleIcon from '@mui/icons-material/People'
-import HomeIcon from '@mui/icons-material/Home'
+import {
+  Home as HomeIcon,
+  People as PeopleIcon,
+  DirectionsCar as DirectionsCarIcon
+} from '@mui/icons-material'
 import ThemeContainer from '../shared/theme/ThemeContainer'
 import createEmotionCache from '../../config/createEmotionCache'
 import { DrawerHeader, Drawer } from '../shared/components/Drawer'
@@ -33,24 +36,7 @@ interface MyAppProps extends AppProps {
 function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
-  const [open, setOpen] = React.useState(true)
-
-  const handleDrawer = () => {
-    setOpen(!open)
-  }
-
-  React.useEffect(() => {
-    const jssStyles = document.querySelector('#jss-server-side')
-    if (jssStyles) {
-      jssStyles?.parentElement?.removeChild(jssStyles)
-    }
-  }, [])
-
   const router = useRouter()
-
-  const handleClick = (url: string) => {
-    router.push(url)
-  }
 
   const items = [
     {
@@ -62,8 +48,30 @@ function MyApp(props: MyAppProps) {
       name: 'Clientes',
       icon: <PeopleIcon />,
       url: '/clients'
+    },
+    {
+      name: 'Veículos',
+      icon: <DirectionsCarIcon />,
+      url: '/vehicles'
     }
   ]
+
+  const [open, setOpen] = useState(true)
+
+  useEffect(() => {
+    const jssStyles = document.querySelector('#jss-server-side')
+    if (jssStyles) {
+      jssStyles?.parentElement?.removeChild(jssStyles)
+    }
+  }, [])
+
+  const handleDrawer = () => {
+    setOpen(!open)
+  }
+
+  const handleClick = (url: string) => {
+    router.push(url)
+  }
 
   return (
     <CacheProvider value={emotionCache}>
@@ -101,7 +109,9 @@ function MyApp(props: MyAppProps) {
                   <ListItem
                     key={item.name}
                     disablePadding
-                    sx={{ display: 'block' }}
+                    sx={{
+                      display: 'block'
+                    }}
                   >
                     <ListItemButton
                       sx={{
@@ -115,14 +125,24 @@ function MyApp(props: MyAppProps) {
                         sx={{
                           minWidth: 0,
                           mr: open ? 3 : 'auto',
-                          justifyContent: 'center'
+                          justifyContent: 'center',
+                          color:
+                            router.pathname === item.url
+                              ? theme => theme.palette.primary.main
+                              : 'inherit'
                         }}
                       >
                         {item.icon}
                       </ListItemIcon>
                       <ListItemText
                         primary={item.name}
-                        sx={{ opacity: open ? 1 : 0 }}
+                        sx={{
+                          opacity: open ? 1 : 0,
+                          color:
+                            router.pathname === item.url
+                              ? theme => theme.palette.primary.main
+                              : 'inherit'
+                        }}
                       />
                     </ListItemButton>
                   </ListItem>
