@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
+import moment from 'moment'
 
 interface NotifyProps {
   open: boolean
@@ -47,12 +48,19 @@ const Page: NextPage = () => {
 
   const [selectedRows, setSelectedRows] = useState<any[]>([])
 
+  const [selected, setSelected] = useState<Displacement | null>(null)
+
   const [form, setForm] = useState<Displacement | null>(null)
 
   const { data, error, isValidating, mutate } =
     useFetch<Displacement[]>('Deslocamento')
 
-  const rows: GridRowsProp = data || []
+  const rows: GridRowsProp =
+    data?.map(item => {
+      item.inicioDeslocamento = formatDateTime(item.inicioDeslocamento)
+      item.fimDeslocamento = formatDateTime(item.fimDeslocamento)
+      return item
+    }) || []
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Código', align: 'center', width: 70 },
@@ -149,10 +157,22 @@ const Page: NextPage = () => {
   }
 
   const handleSelectionChange = (selection: any[]) => {
+    if (selection.length === 1) {
+      const id = selection.find(item => item)
+
+      const selected: Displacement = rows.find(
+        item => item.id === id && !item.kmFinal
+      )
+
+      if (selected) setSelected(selected)
+      else setSelected(null)
+    } else setSelected(null)
     setSelectedRows(selection)
   }
 
   const handleSave = (message: string, status: string) => {
+    setSelected(null)
+
     mutate()
 
     setNotify({
@@ -210,6 +230,12 @@ const Page: NextPage = () => {
     setSelectedRows([])
   }
 
+  function formatDateTime(value: any) {
+    return value
+      ? moment(value, 'YYYY-MM-DDTHH:mm:ss').format('DD/MM/YYYY H:mm:ss')
+      : value
+  }
+
   return (
     <div>
       <Head>
@@ -241,7 +267,7 @@ const Page: NextPage = () => {
           spacing={2}
           sx={{ margin: '8px' }}
         >
-          {selectedRows.length === 1 && (
+          {selected && (
             <Button
               onClick={() => handleEdit(selectedRows.find(item => item))}
               variant="contained"
