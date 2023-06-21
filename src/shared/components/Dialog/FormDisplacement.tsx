@@ -100,6 +100,7 @@ const FormDisplacement: NextPage<FormDisplacementProps> = ({
     }
 
     if (form) setCustomerData(form)
+    else setCustomerData(cleanData)
   }, [open, form])
 
   const fetchData = async () => {

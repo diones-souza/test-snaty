@@ -241,6 +241,15 @@ const Page: NextPage = () => {
           spacing={2}
           sx={{ margin: '8px' }}
         >
+          {selectedRows.length === 1 && (
+            <Button
+              onClick={() => handleEdit(selectedRows.find(item => item))}
+              variant="contained"
+            >
+              <AddIcon />
+              Encerrar
+            </Button>
+          )}
           {selectedRows.length > 0 && (
             <LoadingButton
               loading={isLoading}

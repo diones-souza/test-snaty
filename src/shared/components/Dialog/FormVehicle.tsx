@@ -81,7 +81,7 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
   }
 
   const handleYearChange = (name: string, value: any) => {
-    const year = value.format('YYYY')
+    const year = value?.format('YYYY') ?? null
 
     setCustomerData(prevData => ({
       ...prevData,
