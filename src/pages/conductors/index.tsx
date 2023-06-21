@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
+import { formatDate } from '../../shared/utils/helper'
 
 interface NotifyProps {
   open: boolean
@@ -50,7 +51,11 @@ const Page: NextPage = () => {
   const { data, error, isValidating, mutate } =
     useFetch<Conductor[]>('Condutor')
 
-  const rows: GridRowsProp = data || []
+  const rows: GridRowsProp =
+    data?.map(item => {
+      item.vencimentoHabilitacao = formatDate(item.vencimentoHabilitacao)
+      return item
+    }) || []
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Código', align: 'center', width: 70 },

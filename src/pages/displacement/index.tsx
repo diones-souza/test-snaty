@@ -23,7 +23,7 @@ import {
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
-import moment from 'moment'
+import { formatDateTime } from '../../shared/utils/helper'
 
 interface NotifyProps {
   open: boolean
@@ -228,12 +228,6 @@ const Page: NextPage = () => {
     mutate()
 
     setSelectedRows([])
-  }
-
-  function formatDateTime(value: any) {
-    return value
-      ? moment(value, 'YYYY-MM-DDTHH:mm:ss').format('DD/MM/YYYY H:mm:ss')
-      : value
   }
 
   return (
