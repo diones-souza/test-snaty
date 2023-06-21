@@ -84,12 +84,10 @@ const FormConductor: NextPage<FormClientProps> = ({
     }))
   }
 
-  const handleDateChange = (date: any) => {
-    date = date.format('YYYY-MM-DD')
-
+  const handleDateChange = (name: string, value: any) => {
     setCustomerData(prevData => ({
       ...prevData,
-      vencimentoHabilitacao: date
+      [name]: value
     }))
   }
 
@@ -203,7 +201,9 @@ const FormConductor: NextPage<FormClientProps> = ({
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DatePicker
                 label="Vencimento Habilitação"
-                onChange={handleDateChange}
+                onChange={value =>
+                  handleDateChange('vencimentoHabilitacao', value)
+                }
               />
             </LocalizationProvider>
           </Box>

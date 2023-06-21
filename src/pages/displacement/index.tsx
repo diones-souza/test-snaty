@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import type { NextPage } from 'next'
 import { useFetch } from '../../shared/hooks/useFetch'
-import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid'
+import {
+  DataGrid,
+  GridRowsProp,
+  GridColDef,
+  GridValueGetterParams
+} from '@mui/x-data-grid'
 import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
@@ -17,6 +22,7 @@ import {
   Add as AddIcon
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
+import { LoadingButton } from '@mui/lab'
 
 interface NotifyProps {
   open: boolean
@@ -35,9 +41,13 @@ const Page: NextPage = () => {
 
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
+  const [isLoading, setIsLoading] = useState(false)
+
   const [notify, setNotify] = useState<NotifyProps>(cleanNotify)
 
   const [selectedRows, setSelectedRows] = useState<any[]>([])
+
+  const [form, setForm] = useState<Displacement | null>(null)
 
   const { data, error, isValidating, mutate } =
     useFetch<Displacement[]>('Deslocamento')
@@ -92,6 +102,21 @@ const Page: NextPage = () => {
       field: 'idCliente',
       headerName: 'Código do Cliente.',
       align: 'center'
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      renderCell: (params: GridValueGetterParams) =>
+        !params.row.kmFinal && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleEdit(params.row.id)}
+          >
+            Encerrar
+          </Button>
+        )
     }
   ]
 
@@ -109,7 +134,9 @@ const Page: NextPage = () => {
     }
   }, [error, openDialog])
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (type?: string) => {
+    if (type === 'new') setForm(null)
+
     setOpenDialog(true)
   }
 
@@ -127,6 +154,7 @@ const Page: NextPage = () => {
 
   const handleSave = (message: string, status: string) => {
     mutate()
+
     setNotify({
       open: true,
       message,
@@ -135,8 +163,19 @@ const Page: NextPage = () => {
     })
   }
 
+  const handleEdit = (id: number) => {
+    const form = rows.find(item => item.id === id)
+
+    setForm(form)
+
+    setOpenDialog(true)
+  }
+
   const handleDelete = async () => {
+    setIsLoading(true)
+
     const erros: string[] = []
+
     for (const id of selectedRows) {
       await api.delete(`Deslocamento/${id}`, { data: { id } }).catch(error => {
         const message = error?.response?.data ?? error?.message
@@ -147,6 +186,7 @@ const Page: NextPage = () => {
         )
       })
     }
+
     if (!erros.length) {
       setNotify({
         open: true,
@@ -162,7 +202,11 @@ const Page: NextPage = () => {
         icon: <ErrorIcon />
       })
     }
+
+    setIsLoading(false)
+
     mutate()
+
     setSelectedRows([])
   }
 
@@ -175,6 +219,7 @@ const Page: NextPage = () => {
         open={openDialog}
         onClose={handleCloseDialog}
         onSave={handleSave}
+        form={form}
       />
       <div>
         <div>
@@ -197,12 +242,17 @@ const Page: NextPage = () => {
           sx={{ margin: '8px' }}
         >
           {selectedRows.length > 0 && (
-            <Button onClick={handleDelete} variant="contained" color="error">
+            <LoadingButton
+              loading={isLoading}
+              onClick={handleDelete}
+              variant="contained"
+              color="error"
+            >
               <DeleteIcon />
               Excluir
-            </Button>
+            </LoadingButton>
           )}
-          <Button onClick={handleOpenDialog} variant="contained">
+          <Button onClick={() => handleOpenDialog('new')} variant="contained">
             <AddIcon />
             Novo
           </Button>

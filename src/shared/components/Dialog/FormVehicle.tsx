@@ -80,12 +80,12 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
     }))
   }
 
-  const handleYearChange = (date: any) => {
-    const year = date.format('YYYY')
+  const handleYearChange = (name: string, value: any) => {
+    const year = value.format('YYYY')
 
     setCustomerData(prevData => ({
       ...prevData,
-      anoFabricacao: year
+      [name]: year
     }))
   }
 
@@ -186,7 +186,7 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
               <DatePicker
                 views={['year']}
                 label="Ano de Fabricação"
-                onChange={handleYearChange}
+                onChange={value => handleYearChange('anoFabricacao', value)}
               />
             </LocalizationProvider>
             <TextField

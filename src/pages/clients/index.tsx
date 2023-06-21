@@ -22,6 +22,7 @@ import {
   Add as AddIcon
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
+import { LoadingButton } from '@mui/lab'
 
 interface NotifyProps {
   open: boolean
@@ -39,6 +40,8 @@ const Page: NextPage = () => {
   }
 
   const [openDialog, setOpenDialog] = useState<boolean>(false)
+
+  const [isLoading, setIsLoading] = useState(false)
 
   const [notify, setNotify] = useState<NotifyProps>(cleanNotify)
 
@@ -80,6 +83,7 @@ const Page: NextPage = () => {
         icon: <ErrorIcon />
       })
     }
+
     if (openDialog) {
       setOpenDialog(true)
     }
@@ -103,6 +107,7 @@ const Page: NextPage = () => {
 
   const handleSave = (message: string, status: string) => {
     mutate()
+
     setNotify({
       open: true,
       message,
@@ -125,6 +130,7 @@ const Page: NextPage = () => {
       .put(`Cliente/${id}`, updateRow)
       .then(() => {
         mutate()
+
         setNotify({
           open: true,
           message: 'Registro salvo com sucesso!',
@@ -134,6 +140,7 @@ const Page: NextPage = () => {
       })
       .catch(error => {
         const message = error?.response?.data ?? error?.message
+
         setNotify({
           open: true,
           message:
@@ -147,10 +154,14 @@ const Page: NextPage = () => {
   }
 
   const handleDelete = async () => {
+    setIsLoading(true)
+
     const erros: string[] = []
+
     for (const id of selectedRows) {
       await api.delete(`Cliente/${id}`, { data: { id } }).catch(error => {
         const message = error?.response?.data ?? error?.message
+
         erros.push(
           typeof message === 'string'
             ? message
@@ -158,6 +169,7 @@ const Page: NextPage = () => {
         )
       })
     }
+
     if (!erros.length) {
       setNotify({
         open: true,
@@ -173,7 +185,11 @@ const Page: NextPage = () => {
         icon: <ErrorIcon />
       })
     }
+
+    setIsLoading(false)
+
     mutate()
+
     setSelectedRows([])
   }
 
@@ -208,10 +224,15 @@ const Page: NextPage = () => {
           sx={{ margin: '8px' }}
         >
           {selectedRows.length > 0 && (
-            <Button onClick={handleDelete} variant="contained" color="error">
+            <LoadingButton
+              loading={isLoading}
+              onClick={handleDelete}
+              variant="contained"
+              color="error"
+            >
               <DeleteIcon />
               Excluir
-            </Button>
+            </LoadingButton>
           )}
           <Button onClick={handleOpenDialog} variant="contained">
             <AddIcon />
