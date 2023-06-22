@@ -154,7 +154,7 @@ const FormConductor: NextPage<FormClientProps> = ({
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{'Cadastrar Novo Cliente'}</DialogTitle>
+        <DialogTitle>{'Cadastrar Novo Condutor'}</DialogTitle>
         <Divider />
         <DialogContent>
           <Box

@@ -149,7 +149,7 @@ const FormVehicle: NextPage<FormClientProps> = ({ open, onClose, onSave }) => {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{'Cadastrar Novo Cliente'}</DialogTitle>
+        <DialogTitle>{'Cadastrar Novo Veículo'}</DialogTitle>
         <Divider />
         <DialogContent>
           <Box

@@ -43,7 +43,7 @@ function MyApp(props: MyAppProps) {
 
   const items = [
     {
-      name: 'Home',
+      name: 'Dashboard',
       icon: <HomeIcon />,
       url: '/'
     },
