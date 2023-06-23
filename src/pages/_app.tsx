@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import {
-  Home as HomeIcon,
+  Dashboard as DashboardIcon,
   People as PeopleIcon,
   Commute as CommuteIcon,
   AccountBox as AccountBoxIcon,
@@ -25,7 +25,7 @@ import {
 } from '@mui/icons-material'
 import ThemeContainer from '../shared/theme/ThemeContainer'
 import createEmotionCache from '../../config/createEmotionCache'
-import { DrawerHeader, Drawer } from '../shared/components/Drawer'
+import { DrawerHeader, Drawer } from '../shared/components'
 import logo from '../assets/images/logo.svg'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -44,7 +44,7 @@ function MyApp(props: MyAppProps) {
   const items = [
     {
       name: 'Dashboard',
-      icon: <HomeIcon />,
+      icon: <DashboardIcon />,
       url: '/'
     },
     {
