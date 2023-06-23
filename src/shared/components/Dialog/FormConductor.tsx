@@ -19,6 +19,7 @@ import Slide from '@mui/material/Slide'
 import { TransitionProps } from '@mui/material/transitions'
 import * as yup from 'yup'
 import api from '../../services/api'
+import moment from 'moment'
 
 export interface Conductor {
   id?: number
@@ -85,9 +86,11 @@ const FormConductor: NextPage<FormClientProps> = ({
   }
 
   const handleDateChange = (name: string, value: any) => {
+    const date = moment(value).format('YYYY-MM-DD')
+
     setCustomerData(prevData => ({
       ...prevData,
-      [name]: value
+      [name]: date
     }))
   }
 

@@ -24,6 +24,7 @@ import api from '../../services/api'
 import { Client } from './FormClient'
 import { Conductor } from './FormConductor'
 import { Vehicle } from './FormVehicle'
+import moment from 'moment'
 
 export interface Displacement {
   id?: number
@@ -154,9 +155,11 @@ const FormDisplacement: NextPage<FormDisplacementProps> = ({
   }
 
   const handleDateTimeChange = (name: string, value: any) => {
+    const dateTime = moment(value).format('YYYY-MM-DDTHH:mm:ss')
+
     setCustomerData(prevData => ({
       ...prevData,
-      [name]: value
+      [name]: dateTime
     }))
   }
 
