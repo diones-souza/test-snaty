@@ -1,71 +1,139 @@
 import React, { useEffect, useState } from 'react'
 import type { NextPage } from 'next'
+import { useFetch } from '../shared/hooks/useFetch'
 import Head from 'next/head'
 import { Chart } from 'react-google-charts'
+import {
+  Card,
+  Grid,
+  Box,
+  Typography,
+  LinearProgress,
+  CardHeader,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Tooltip
+} from '@mui/material'
+import {
+  MoreVertSharp as MoreVertIcon,
+  CheckCircle as CheckCircleIcon
+} from '@mui/icons-material'
+import { Client, Conductor, Vehicle, Displacement } from '../shared/components'
+import { formatDate } from '../shared/utils/helper'
 import moment from 'moment'
-import { Card, Grid, Box, Typography, LinearProgress } from '@mui/material'
 
-interface DailyData {
-  day: string
-  Clientes: number
-  Veículos: number
-  Condutores: number
-  Deslocamentos: number
+interface Data extends Displacement {
+  client?: Client
+  conductor?: Conductor
+  vehicle?: Vehicle
+  type?: string
 }
 
 const Dashboard: NextPage = () => {
   const [chartData, setChartData] = useState<any[]>([])
 
+  const { data: clients, isLoading: clientsIsLoading } =
+    useFetch<Client[]>('Cliente')
+
+  const { data: conductors, isLoading: conductorsIsLoading } =
+    useFetch<Conductor[]>('Condutor')
+
+  const { data: displacements, isLoading: displacementsIsLoading } =
+    useFetch<Data[]>('Deslocamento')
+
+  const { data: vehicles, isLoading: vehiclesIsLoading } =
+    useFetch<Vehicle[]>('Veiculo')
+
   useEffect(() => {
-    const getDailyData = () => {
-      // Dados fictícios para exemplo
-      const data = [
-        { tipo: 'Clientes', dataRegistro: '2023-06-01' },
-        { tipo: 'Clientes', dataRegistro: '2023-06-01' },
-        { tipo: 'Veículos', dataRegistro: '2023-06-01' },
-        { tipo: 'Condutores', dataRegistro: '2023-06-02' },
-        { tipo: 'Clientes', dataRegistro: '2023-06-02' },
-        { tipo: 'Deslocamentos', dataRegistro: '2023-06-02' },
-        { tipo: 'Veículos', dataRegistro: '2023-06-03' },
-        { tipo: 'Deslocamentos', dataRegistro: '2023-06-03' }
-      ]
+    if (
+      !clientsIsLoading &&
+      !conductorsIsLoading &&
+      !displacementsIsLoading &&
+      !vehiclesIsLoading
+    ) {
+      displacements?.map(item => {
+        item.client = clients?.find(({ id }) => id === item.idCliente)
+        item.conductor = conductors?.find(({ id }) => id === item.idCondutor)
+        item.vehicle = vehicles?.find(({ id }) => id === item.idVeiculo)
+        item.type = !item.kmFinal ? 'started' : 'finished'
+        return item
+      })
+    }
+    loadChartData()
+  }, [
+    clientsIsLoading,
+    conductorsIsLoading,
+    displacementsIsLoading,
+    vehiclesIsLoading
+  ])
 
-      const dailyData: { [key: string]: DailyData } = data.reduce(
-        (result: any, item) => {
-          const day = moment(item.dataRegistro).format('YYYY-MM-DD')
-          if (!result[day]) {
-            result[day] = {
-              day,
-              Clientes: 0,
-              Veículos: 0,
-              Condutores: 0,
-              Deslocamentos: 0
-            }
-          }
-          result[day][item.tipo] += 1
-          return result
-        },
-        {}
-      )
+  const loadChartData = () => {
+    const data = displacements
 
-      const chartData = Object.values(dailyData).map(
-        ({ day, Clientes, Veículos, Condutores, Deslocamentos }) => [
-          day,
-          Clientes,
-          Veículos,
-          Condutores,
-          Deslocamentos
-        ]
-      )
+    const today = moment().startOf('day')
 
-      setChartData([
-        ['Dia', 'Clientes', 'Veículos', 'Condutores', 'Deslocamentos'],
-        ...chartData
-      ])
+    let chartData = []
+
+    for (let i = 6; i >= 0; i--) {
+      const date = moment(today).subtract(i, 'days')
+      const started =
+        data?.filter(({ inicioDeslocamento, type }) => {
+          return (
+            date.isSame(
+              moment(
+                formatDate(inicioDeslocamento, 'DD/MM/YYYY H:mm:ss'),
+                'DD/MM/YYYY H:mm:ss',
+                true
+              ),
+              'day'
+            ) && type === 'started'
+          )
+        }).length ?? 0
+
+      const finished =
+        data?.filter(({ inicioDeslocamento, type }) => {
+          return (
+            date.isSame(
+              moment(
+                formatDate(inicioDeslocamento, 'DD/MM/YYYY H:mm:ss'),
+                'DD/MM/YYYY H:mm:ss',
+                true
+              ),
+              'day'
+            ) && type === 'finished'
+          )
+        }).length ?? 0
+
+      chartData.push({
+        day: date.format('DD/MM'),
+        started,
+        finished
+      })
     }
 
-    getDailyData()
-  }, [])
+    const dailyData: { [key: string]: any } = chartData?.reduce(
+      (result: any, item) => {
+        if (!result[item.day]) {
+          result[item.day] = {
+            ...item
+          }
+        }
+
+        return result
+      },
+      {}
+    )
+
+    chartData = Object.values(dailyData).map(({ day, started, finished }) => [
+      day,
+      started,
+      finished
+    ])
+
+    setChartData([['Dia', 'Em Rota', 'Finalizado'], ...chartData])
+  }
 
   return (
     <div>
@@ -85,16 +153,28 @@ const Dashboard: NextPage = () => {
         }}
       >
         <Grid container>
-          <Grid container xs={9}>
+          <Grid container sx={{ width: '70%' }}>
             <Grid item xs={4}>
               <Card
                 sx={{
                   borderRadius: '16px',
                   boxShadow:
                     '0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important',
-                  minHeight: '150px'
+                  height: '150px'
                 }}
-              ></Card>
+              >
+                <CardHeader
+                  action={
+                    <IconButton>
+                      <MoreVertIcon />
+                    </IconButton>
+                  }
+                  title={<Typography variant="subtitle1">Clientes</Typography>}
+                />
+                <Typography variant="h3" align="center" color="#3366cc">
+                  {clients?.length}
+                </Typography>
+              </Card>
             </Grid>
             <Grid item xs={4}>
               <Card
@@ -102,9 +182,21 @@ const Dashboard: NextPage = () => {
                   borderRadius: '16px',
                   boxShadow:
                     '0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important',
-                  minHeight: '150px'
+                  height: '150px'
                 }}
-              ></Card>
+              >
+                <CardHeader
+                  action={
+                    <IconButton>
+                      <MoreVertIcon />
+                    </IconButton>
+                  }
+                  title={<Typography variant="subtitle1">Veículos</Typography>}
+                />
+                <Typography variant="h3" align="center" color="#dc3912">
+                  {vehicles?.length}
+                </Typography>
+              </Card>
             </Grid>
             <Grid item xs={4}>
               <Card
@@ -112,9 +204,25 @@ const Dashboard: NextPage = () => {
                   borderRadius: '16px',
                   boxShadow:
                     '0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important',
-                  minHeight: '150px'
+                  height: '150px'
                 }}
-              ></Card>
+              >
+                <div>
+                  <CardHeader
+                    action={
+                      <IconButton>
+                        <MoreVertIcon />
+                      </IconButton>
+                    }
+                    title={
+                      <Typography variant="subtitle1">Condutores</Typography>
+                    }
+                  />
+                  <Typography variant="h3" align="center" color="#ff9900">
+                    {conductors?.length}
+                  </Typography>
+                </div>
+              </Card>
             </Grid>
             <Grid item xs={12}>
               <Card
@@ -140,16 +248,42 @@ const Dashboard: NextPage = () => {
               </Card>
             </Grid>
           </Grid>
-          <Grid container xs={3}>
+          <Grid container sx={{ width: '30%' }}>
             <Grid item xs={12}>
               <Card
                 sx={{
                   borderRadius: '16px',
                   boxShadow:
                     '0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important',
-                  minHeight: '517px'
+                  height: '517px'
                 }}
-              ></Card>
+              >
+                <CardHeader
+                  title={<Typography variant="subtitle1">Em rota</Typography>}
+                />
+                <List>
+                  {displacements?.map(
+                    item =>
+                      !item.kmFinal && (
+                        <ListItem
+                          key={item.id}
+                          secondaryAction={
+                            <Tooltip title="Encerrar">
+                              <IconButton>
+                                <CheckCircleIcon color="primary" />
+                              </IconButton>
+                            </Tooltip>
+                          }
+                        >
+                          <ListItemText
+                            primary={item?.conductor?.nome}
+                            secondary={`${item?.vehicle?.marcaModelo} - ${item?.vehicle?.anoFabricacao}`}
+                          />
+                        </ListItem>
+                      )
+                  )}
+                </List>
+              </Card>
             </Grid>
           </Grid>
         </Grid>
