@@ -1,27 +1,40 @@
 import moment from 'moment'
 
-function formatDateTime(value: any) {
-  const formattedDateTime = moment(value, 'YYYY-MM-DDTHH:mm:ss').format(
-    'DD/MM/YYYY H:mm:ss'
-  )
+const dateFormats = [
+  'YYYY-MM-DDTHH:mm:ss',
+  'YYYY-MM-DDTHH:mm:ss.sssZ',
+  'DD/MM/YYYY H:mm:ss',
+  'YYYY-MM-DD',
+  'MM/DD/YYYY',
+  'DD-MM-YYYY',
+  'DD/MM/YYYY'
+]
 
-  if (moment(formattedDateTime, 'DD/MM/YYYY H:mm:ss').isValid()) {
-    return formattedDateTime
-  } else {
-    return value
+const defaultFormat = 'DD/MM/YYYY'
+
+function formatDate(value: any, format?: string) {
+  format = format ?? defaultFormat
+
+  let formattedDate
+
+  if (!isAlreadyFormatted(value, format)) {
+    for (let i = 0; i < dateFormats.length; i++) {
+      const date = moment(value, dateFormats[i])
+
+      if (date.isValid()) {
+        formattedDate = date.format(format)
+        break
+      }
+    }
   }
+
+  return formattedDate ?? value
 }
 
-function formatDate(value: any) {
-  const formattedDate = moment(value, 'YYYY-MM-DDTHH:mm:ss').format(
-    'DD/MM/YYYY'
-  )
+function isAlreadyFormatted(value: any, format: string) {
+  const formattedDate = moment(value, format, true)
 
-  if (moment(formattedDate, 'DD/MM/YYYY').isValid()) {
-    return formattedDate
-  } else {
-    return value
-  }
+  return formattedDate.isValid()
 }
 
-export { formatDateTime, formatDate }
+export { formatDate, isAlreadyFormatted }
