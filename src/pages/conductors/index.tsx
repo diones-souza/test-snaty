@@ -24,6 +24,7 @@ import {
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
 import { formatDate } from '../../shared/utils/helper'
+import moment from 'moment'
 
 interface NotifyProps {
   open: boolean
@@ -53,7 +54,16 @@ const Page: NextPage = () => {
 
   const rows: GridRowsProp =
     data?.map(item => {
-      item.vencimentoHabilitacao = formatDate(item.vencimentoHabilitacao)
+      const formattedDate = moment(
+        item.vencimentoHabilitacao,
+        'DD/MM/YYYY',
+        true
+      )
+
+      if (!formattedDate.isValid()) {
+        item.vencimentoHabilitacao = formatDate(item.vencimentoHabilitacao)
+      }
+
       return item
     }) || []
 
@@ -237,13 +247,16 @@ const Page: NextPage = () => {
               onClick={handleDelete}
               variant="contained"
               color="error"
+              startIcon={<DeleteIcon />}
             >
-              <DeleteIcon />
               Excluir
             </LoadingButton>
           )}
-          <Button onClick={handleOpenDialog} variant="contained">
-            <AddIcon />
+          <Button
+            onClick={handleOpenDialog}
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
             Novo
           </Button>
         </Stack>

@@ -229,13 +229,16 @@ const Page: NextPage = () => {
               onClick={handleDelete}
               variant="contained"
               color="error"
+              startIcon={<DeleteIcon />}
             >
-              <DeleteIcon />
               Excluir
             </LoadingButton>
           )}
-          <Button onClick={handleOpenDialog} variant="contained">
-            <AddIcon />
+          <Button
+            onClick={handleOpenDialog}
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
             Novo
           </Button>
         </Stack>

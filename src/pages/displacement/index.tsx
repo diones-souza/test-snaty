@@ -23,7 +23,7 @@ import {
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
-import { formatDateTime } from '../../shared/utils/helper'
+import { formatDate } from '../../shared/utils/helper'
 
 interface NotifyProps {
   open: boolean
@@ -57,8 +57,16 @@ const Page: NextPage = () => {
 
   const rows: GridRowsProp =
     data?.map(item => {
-      item.inicioDeslocamento = formatDateTime(item.inicioDeslocamento)
-      item.fimDeslocamento = formatDateTime(item.fimDeslocamento)
+      item.inicioDeslocamento = formatDate(
+        item.inicioDeslocamento,
+        'DD/MM/YYYY H:mm:ss'
+      )
+
+      item.fimDeslocamento = formatDate(
+        item.fimDeslocamento,
+        'DD/MM/YYYY H:mm:ss'
+      )
+
       return item
     }) || []
 
@@ -114,13 +122,14 @@ const Page: NextPage = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 120,
+      width: 150,
+      align: 'center',
       renderCell: (params: GridValueGetterParams) =>
         !params.row.kmFinal && (
           <Button
-            variant="contained"
-            color="primary"
             onClick={() => handleEdit(params.row.id)}
+            variant="outlined"
+            startIcon={<CheckCircleIcon />}
           >
             Encerrar
           </Button>
@@ -264,9 +273,9 @@ const Page: NextPage = () => {
           {selected && (
             <Button
               onClick={() => handleEdit(selectedRows.find(item => item))}
-              variant="contained"
+              variant="outlined"
+              startIcon={<CheckCircleIcon />}
             >
-              <AddIcon />
               Encerrar
             </Button>
           )}
@@ -276,13 +285,16 @@ const Page: NextPage = () => {
               onClick={handleDelete}
               variant="contained"
               color="error"
+              startIcon={<DeleteIcon />}
             >
-              <DeleteIcon />
               Excluir
             </LoadingButton>
           )}
-          <Button onClick={() => handleOpenDialog('new')} variant="contained">
-            <AddIcon />
+          <Button
+            onClick={() => handleOpenDialog('new')}
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
             Novo
           </Button>
         </Stack>
