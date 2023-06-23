@@ -11,6 +11,7 @@ import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
   Notify,
+  NotifyProps,
   FormClient,
   Client
 } from '../../shared/components'
@@ -23,13 +24,6 @@ import {
 } from '@mui/icons-material'
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
-
-interface NotifyProps {
-  open: boolean
-  message: string
-  color: string
-  icon: any
-}
 
 const Page: NextPage = () => {
   const cleanNotify: NotifyProps = {

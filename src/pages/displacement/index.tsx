@@ -11,6 +11,7 @@ import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
   Notify,
+  NotifyProps,
   FormDisplacement,
   Displacement
 } from '../../shared/components'
@@ -24,13 +25,6 @@ import {
 import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
 import { formatDate } from '../../shared/utils/helper'
-
-interface NotifyProps {
-  open: boolean
-  message: string
-  color: string
-  icon: any
-}
 
 const Page: NextPage = () => {
   const cleanNotify: NotifyProps = {
@@ -146,10 +140,7 @@ const Page: NextPage = () => {
         icon: <ErrorIcon />
       })
     }
-    if (openDialog) {
-      setOpenDialog(true)
-    }
-  }, [error, openDialog])
+  }, [error])
 
   const handleOpenDialog = (type?: string) => {
     if (type === 'new') setForm(null)

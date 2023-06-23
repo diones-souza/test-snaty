@@ -3,7 +3,11 @@ import type { NextPage } from 'next'
 import { useFetch } from '../../shared/hooks/useFetch'
 import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid'
 import { LinearProgress } from '@mui/material'
-import { CustomNoRowsOverlay, Notify } from '../../shared/components'
+import {
+  CustomNoRowsOverlay,
+  Notify,
+  NotifyProps
+} from '../../shared/components'
 import Head from 'next/head'
 import { Error as ErrorIcon } from '@mui/icons-material'
 
@@ -12,13 +16,6 @@ interface WeatherForecast {
   temperatureC: number
   temperatureF: number
   summary: string
-}
-
-interface NotifyProps {
-  open: boolean
-  message: string
-  color: string
-  icon: any
 }
 
 const Page: NextPage = () => {

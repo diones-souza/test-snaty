@@ -3,6 +3,13 @@ import type { NextPage } from 'next'
 import Snackbar, { SnackbarProps } from '@mui/material/Snackbar'
 import MuiAlert, { AlertProps } from '@mui/material/Alert'
 
+export interface NotifyProps {
+  open: boolean
+  message: string
+  color: string
+  icon: any
+}
+
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
   ref
@@ -10,13 +17,13 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-type NotifyProps = PropsWithChildren<SnackbarProps> & {
+type Props = PropsWithChildren<SnackbarProps> & {
   color: any
   icon: any
   onClose(): void
 }
 
-const Notify: NextPage<NotifyProps> = ({
+const Notify: NextPage<Props> = ({
   anchorOrigin,
   autoHideDuration,
   open,

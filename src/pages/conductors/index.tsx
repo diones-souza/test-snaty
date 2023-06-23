@@ -11,6 +11,7 @@ import { LinearProgress, Stack, Button } from '@mui/material'
 import {
   CustomNoRowsOverlay,
   Notify,
+  NotifyProps,
   FormConductor,
   Conductor
 } from '../../shared/components'
@@ -25,13 +26,6 @@ import api from '../../shared/services/api'
 import { LoadingButton } from '@mui/lab'
 import { formatDate } from '../../shared/utils/helper'
 import moment from 'moment'
-
-interface NotifyProps {
-  open: boolean
-  message: string
-  color: string
-  icon: any
-}
 
 const Page: NextPage = () => {
   const cleanNotify: NotifyProps = {

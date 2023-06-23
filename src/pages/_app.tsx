@@ -12,7 +12,13 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Hidden
+  Hidden,
+  Avatar,
+  Menu,
+  MenuItem,
+  Divider,
+  Typography,
+  Tooltip
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import {
@@ -21,7 +27,10 @@ import {
   Commute as CommuteIcon,
   AccountBox as AccountBoxIcon,
   DirectionsCar as DirectionsCarIcon,
-  NightsStay as NightsStayIcon
+  NightsStay as NightsStayIcon,
+  PersonAdd,
+  Settings,
+  Logout
 } from '@mui/icons-material'
 import ThemeContainer from '../shared/theme/ThemeContainer'
 import createEmotionCache from '../../config/createEmotionCache'
@@ -74,7 +83,11 @@ function MyApp(props: MyAppProps) {
     }
   ]
 
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState<boolean>(true)
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
+  const openMenu = Boolean(anchorEl)
 
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side')
@@ -89,6 +102,14 @@ function MyApp(props: MyAppProps) {
 
   const handleClick = (url: string) => {
     router.push(url)
+  }
+
+  const handleMenuOpen = (event: any) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
   }
 
   return (
@@ -117,6 +138,87 @@ function MyApp(props: MyAppProps) {
                 <MenuIcon />
               </IconButton>
               <Image width={40} height={40} src={logo}></Image>
+              <div style={{ marginLeft: 'auto' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Typography sx={{ minWidth: 100 }}>Contact</Typography>
+                  <Tooltip title="Account settings">
+                    <IconButton
+                      onClick={handleMenuOpen}
+                      size="small"
+                      sx={{ ml: 2 }}
+                      aria-controls={openMenu ? 'account-menu' : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={openMenu ? 'true' : undefined}
+                    >
+                      <Avatar
+                        sx={{ width: 32, height: 32 }}
+                        src="https://avatars.githubusercontent.com/u/51972715?v=4"
+                      ></Avatar>
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={openMenu}
+                  onClose={handleMenuClose}
+                  PaperProps={{
+                    elevation: 0,
+                    sx: {
+                      overflow: 'visible',
+                      filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                      mt: 1.5,
+                      '& .MuiAvatar-root': {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 1
+                      },
+                      '&:before': {
+                        content: '""',
+                        display: 'block',
+                        position: 'absolute',
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: 'background.paper',
+                        transform: 'translateY(-50%) rotate(45deg)',
+                        zIndex: 0
+                      }
+                    }
+                  }}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                  <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleMenuClose}>
+                    <ListItemIcon>
+                      <PersonAdd fontSize="small" />
+                    </ListItemIcon>
+                    Add another account
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    Settings
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose}>
+                    <ListItemIcon>
+                      <Logout fontSize="small" />
+                    </ListItemIcon>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </div>
             </Toolbar>
           </AppBar>
           <Hidden mdDown={open}>
