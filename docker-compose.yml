@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: app-nextjs
+    container_name: app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    networks:
+      - app-nextjs
+networks:
+  app-nextjs:
+    driver: bridge

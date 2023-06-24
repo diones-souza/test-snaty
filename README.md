@@ -50,23 +50,37 @@ Por favor, envie o link para o repositório Git público contendo a sua soluçã
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Application Result View
+
+![App](https://uploaddeimagens.com.br/imagens/56QbJbQ)
+
 ## Getting Started
 
-First, run the development server:
+### Deployment in Production:
 
 ```bash
+docker-compose up -d --build
+#or
+npm i
+npm run build
+npm run start
+#or
+yarn
+yarn build
+yarn start
+```
+
+### Development server:
+
+```bash
+npm i
 npm run dev
 # or
+yarn
 yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
 ## Learn More
 
