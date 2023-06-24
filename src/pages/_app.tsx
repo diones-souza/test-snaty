@@ -40,7 +40,6 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 const clientSideEmotionCache = createEmotionCache()
-
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
