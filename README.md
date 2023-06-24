@@ -58,13 +58,26 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ### Deployment in Production:
 
+#### docker
+```bash
+docker build -t app .
+docker run -p 3000:3000 app
+```
+
+#### docker-compose
 ```bash
 docker-compose up -d --build
-#or
+```
+
+#### npm
+```bash
 npm i
 npm run build
 npm run start
-#or
+```
+
+#### yarn
+```bash
 yarn
 yarn build
 yarn start
